@@ -16,6 +16,6 @@
 terraform {
   backend "gcs" {
     bucket = "bichapter-tfstate"
-    prefix = "env/dev"
+    prefix = "hadoan/env/dev"
   }
 }

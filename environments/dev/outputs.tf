@@ -13,22 +13,31 @@
 # limitations under the License.
 
 
-output "network" {
-  value = "${module.vpc.network}"
+# output "network" {
+#   value = "${module.vpc.network}"
+# }
+
+# output "subnet" {
+#   value = "${module.vpc.subnet}"
+# }
+
+# output "firewall_rule" {
+#   value = "${module.firewall.firewall_rule}"
+# }
+
+# output "instance_name" {
+#   value = "${module.http_server.instance_name}"
+# }
+
+# output "external_ip" {
+#   value = "${module.http_server.external_ip}"
+# }
+
+
+output "df_instance" {
+  value = module.data_fusion.instance
 }
 
-output "subnet" {
-  value = "${module.vpc.subnet}"
-}
-
-output "firewall_rule" {
-  value = "${module.firewall.firewall_rule}"
-}
-
-output "instance_name" {
-  value = "${module.http_server.instance_name}"
-}
-
-output "external_ip" {
-  value = "${module.http_server.external_ip}"
+output "df_tenant_id" {
+  value = module.data_fusion.tenant_project
 }

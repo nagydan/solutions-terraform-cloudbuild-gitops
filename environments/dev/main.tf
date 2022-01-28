@@ -18,23 +18,51 @@ locals {
 }
 
 provider "google" {
-  project = "${var.project}"
+  project = var.project
 }
 
-module "vpc" {
-  source  = "../../modules/vpc"
-  project = "${var.project}"
-  env     = "${local.env}"
+# module "vpc" {
+#   source  = "../../modules/vpc"
+#   project = "${var.project}"
+#   env     = "${local.env}"
+# }
+
+# module "http_server" {
+#   source  = "../../modules/http_server"
+#   project = "${var.project}"
+#   subnet  = "${module.vpc.subnet}"
+# }
+
+# module "firewall" {
+#   source  = "../../modules/firewall"
+#   project = "${var.project}"
+#   subnet  = "${module.vpc.subnet}"
+# }
+
+data "google_client_config" "current" {
 }
 
-module "http_server" {
-  source  = "../../modules/http_server"
-  project = "${var.project}"
-  subnet  = "${module.vpc.subnet}"
+module "data_fusion" {
+  source  = "terraform-google-modules/data-fusion/google"
+  version = "1.1.0"
+
+  name    = "df-instance-01-terraform-ha"
+  project = var.project
+  region  = var.region
+  data_fusion_service_account = "bichapter@appspot.gserviceaccount.com"
+  type    = "BASIC"
+  network = "data-fusion-vpc-terraform-ha"
+  # options = {
+  #    "accelerators.accelerator_type":"CDC"
+  #    "accelerators.state":"ENABLED"
+  # }
+  
 }
 
-module "firewall" {
-  source  = "../../modules/firewall"
-  project = "${var.project}"
-  subnet  = "${module.vpc.subnet}"
+resource "null_resource" "df-enable-replication-mode" {
+  provisioner "local-exec" {
+      command = "python3 ${path.module}/df-enable-replication.py -p ${var.project} -l ${var.region} -i df-instance-01-terraform-ha -t ${data.google_client_config.current.access_token}"
+  }
+
+  depends_on = [module.data_fusion.instance]
 }
